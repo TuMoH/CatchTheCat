@@ -14,7 +14,12 @@ class MainActivity : AppCompatActivity() {
     private var statusBarHeight = 0
     private var init = true
 
-    private var tails: Array<Array<View?>> = Array(11) { arrayOfNulls<View>(11) }
+    private val ROW = 11
+    private val CELL = 11
+    private var tails: Array<Array<View?>> = Array(ROW) { arrayOfNulls<View>(CELL) }
+    private var checkedTails: Array<BooleanArray> = Array(ROW) { BooleanArray(CELL) }
+
+    private var currentPosition: IntArray = intArrayOf((ROW - 1) / 2, (CELL - 1) / 2)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +39,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 gravity = Gravity.CENTER
 
-                for (i in 0..10) {
+                for (i in 0..ROW - 1) {
                     linearLayout {
                         lparams {
                             width = ViewGroup.LayoutParams.MATCH_PARENT
@@ -47,7 +52,7 @@ class MainActivity : AppCompatActivity() {
                             setPadding(dip(10), 0, 0, 0)
                         }
 
-                        for (j in 0..10) {
+                        for (j in 0..CELL - 1) {
                             tails[i][j] = imageView {
                                 lparams {
                                     weight = 1f
@@ -61,7 +66,8 @@ class MainActivity : AppCompatActivity() {
                                     isClickable = false
                                     setColorFilter(resources.getColor(R.color.activated_tail))
 
-                                    moveCat(it)
+                                    checkedTails[i][j] = true
+                                    findPathAndMoveCat()
                                 }
                             }
                         }
@@ -74,13 +80,16 @@ class MainActivity : AppCompatActivity() {
                     width = ViewGroup.LayoutParams.WRAP_CONTENT
                     height = ViewGroup.LayoutParams.WRAP_CONTENT
                 }
+                // todo change resource
                 imageResource = R.drawable.ic_insert_emoticon_black_24dp
             }
 
             addOnLayoutChangeListener { view, i, k, l, j, h, g, f, d ->
                 if (init) {
-                    moveCat(tails[5][5])
                     init = false
+                    moveCat(tails[5][5])
+
+                    // todo check random tails
                 }
             }
         }
@@ -95,6 +104,22 @@ class MainActivity : AppCompatActivity() {
         return result
     }
 
+    fun findPathAndMoveCat() {
+        moveCat(findPath())
+    }
+
+    fun findPath(): View? {
+        var row = currentPosition[0] + 1
+        var cell = currentPosition[1] + 1
+
+        // todo find path and check last cell for end game
+
+        currentPosition[0] = row
+        currentPosition[1] = cell
+
+        return tails[row][cell]
+    }
+
     fun moveCat(tail: View?) {
         if (tail != null) {
             val location = IntArray(2)
@@ -103,7 +128,8 @@ class MainActivity : AppCompatActivity() {
             val offsetY = (tail.height - cat.height).toFloat() / 2
             cat.x = location[0].toFloat() + offsetX
             cat.y = location[1].toFloat() + offsetY - statusBarHeight
-            cat.bringToFront()
+
+            // todo add animation
         }
     }
 
