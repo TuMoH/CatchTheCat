@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import org.jetbrains.anko.*
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,7 +17,7 @@ class MainActivity : AppCompatActivity() {
 
     private val ROW = 11
     private val CELL = 11
-    private var tails: Array<Array<View?>> = Array(ROW) { arrayOfNulls<View>(CELL) }
+    private var tails: Array<Array<ImageView?>> = Array(ROW) { arrayOfNulls<ImageView>(CELL) }
     private var checkedTails: Array<BooleanArray> = Array(ROW) { BooleanArray(CELL) }
 
     private var currentPosition: IntArray = intArrayOf((ROW - 1) / 2, (CELL - 1) / 2)
@@ -30,6 +31,17 @@ class MainActivity : AppCompatActivity() {
             lparams {
                 width = ViewGroup.LayoutParams.MATCH_PARENT
                 height = ViewGroup.LayoutParams.MATCH_PARENT
+            }
+
+            button {
+                lparams {
+                    width = ViewGroup.LayoutParams.WRAP_CONTENT
+                    height = ViewGroup.LayoutParams.WRAP_CONTENT
+                }
+                text = "reset"
+                onClick {
+                    recreate()
+                }
             }
 
             verticalLayout {
@@ -63,10 +75,7 @@ class MainActivity : AppCompatActivity() {
                                 imageResource = R.drawable.ic_lens_black_24dp
 
                                 onClick {
-                                    isClickable = false
-                                    setColorFilter(resources.getColor(R.color.activated_tail))
-
-                                    checkedTails[i][j] = true
+                                    checkTail(i, j)
                                     findPathAndMoveCat()
                                 }
                             }
@@ -89,7 +98,16 @@ class MainActivity : AppCompatActivity() {
                     init = false
                     moveCat(tails[5][5])
 
-                    // todo check random tails
+                    val random = Random()
+                    var needCheck = random.nextInt(12 - 7) + 7
+                    while (needCheck > 0) {
+                        val row = random.nextInt(10)
+                        val cell = random.nextInt(10)
+                        if (row !in 4..6 && cell !in 4..6) {
+                            checkTail(row, cell)
+                            needCheck--
+                        }
+                    }
                 }
             }
         }
@@ -102,6 +120,15 @@ class MainActivity : AppCompatActivity() {
             result = resources.getDimensionPixelSize(resourceId)
         }
         return result
+    }
+
+    fun checkTail(row: Int, cell: Int) {
+        val view = tails[row][cell]!!
+
+        view.isClickable = false
+        view.setColorFilter(resources.getColor(R.color.activated_tail))
+
+        checkedTails[row][cell] = true
     }
 
     fun findPathAndMoveCat() {
