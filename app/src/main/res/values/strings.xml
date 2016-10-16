@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">CatchTheCat</string>
+
+    <string name="defeat_title">Кот победил!</string>
+    <string name="defeat_msg">Повторить?</string>
+    <string name="defeat_yes">Да</string>
+    <string name="defeat_no">Нет</string>
 </resources>
