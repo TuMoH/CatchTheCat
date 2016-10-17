@@ -1,5 +1,6 @@
 package com.timursoft.catchthecat
 
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
@@ -95,7 +96,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 isClickable = true
                 // todo change resource
-                imageResource = R.drawable.ic_smile
+                val bitmap = BitmapFactory.decodeStream(assets.open("sprites/boss6/boss6_cry.png"))
+                val animation = AssetAnimationDrawable(bitmap, 6, 10)
+                setImageDrawable(animation)
+                animation.start()
             }
 
             addOnLayoutChangeListener { view, i, k, l, j, h, g, f, d ->
