@@ -1,11 +1,11 @@
 package com.timursoft.catchthecat
 
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.Toast
 import org.jetbrains.anko.*
 import org.xguzm.pathfinding.grid.finders.AStarGridFinder
 import org.xguzm.pathfinding.grid.finders.GridFinderOptions
@@ -14,30 +14,32 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private var cat = Cat()
-    private var init = true
-
-    private lateinit var tv: TextView
-
     private val Xs = 10
     private val Ys = 10
-    private var cells: Array<Array<Cell?>> = Array(Ys + 1) { arrayOfNulls<Cell>(Xs + 1) }
 
     private val finder = AStarGridFinder(Cell::class.java, GridFinderOptions(true, false, ManhattanDistance(), false, 1f, 1f))
-    private val navGrid = CatNavigationGrid(cells)
+
+    private var init = true
+    private var cat = Cat()
+    private var rootLayout: View? = null
+    private var cells: Array<Array<Cell?>> = Array(Ys + 1) { arrayOfNulls<Cell>(Xs + 1) }
+    private var navGrid = CatNavigationGrid(cells)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        init()
+    }
+
+    fun init() {
         cat.statusBarHeight = getStatusBarHeight()
 
-        frameLayout {
+        rootLayout = frameLayout {
             lparams {
                 width = ViewGroup.LayoutParams.MATCH_PARENT
                 height = ViewGroup.LayoutParams.MATCH_PARENT
             }
-
-            tv = textView {}
+            alpha = 0f
 
             verticalLayout {
                 lparams {
@@ -54,9 +56,9 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         if (y % 2 == 0) {
-                            setPadding(0, 0, dip(24), 0)
+                            setPadding(0, 0, dip(12), 0)
                         } else {
-                            setPadding(dip(24), 0, 0, 0)
+                            setPadding(dip(12), 0, 0, 0)
                         }
 
                         for (x in 0..Xs) {
@@ -66,13 +68,12 @@ class MainActivity : AppCompatActivity() {
                                     width = ViewGroup.LayoutParams.WRAP_CONTENT
                                     height = ViewGroup.LayoutParams.WRAP_CONTENT
                                 }
-//                                adjustViewBounds = true
                                 imageResource = R.drawable.ic_cell
 
                                 onClick {
                                     cells[x][y]?.check()
                                     if (isEnd()) {
-                                        showEndDialog(R.string.defeat_title)
+                                        showEndDialog(R.string.defeat_msg)
                                     } else {
                                         val path = findPath()
                                         if (path != null) {
@@ -112,6 +113,7 @@ class MainActivity : AppCompatActivity() {
                             needCheck--
                         }
                     }
+                    rootLayout!!.animate().alpha(1f).duration = 1000
                 }
             }
         }
@@ -143,7 +145,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (path == null) {
-            showEndDialog(R.string.win_title)
+            showEndDialog(R.string.win_msg)
             return null
         }
 
@@ -162,18 +164,21 @@ class MainActivity : AppCompatActivity() {
         return lastShortPath
     }
 
-    fun showEndDialog(titleId: Int) {
-        AlertDialog.Builder(this@MainActivity)
-                .setTitle(titleId)
-                .setMessage(R.string.defeat_msg)
-                .setNegativeButton(R.string.defeat_no, { dialog, i ->
-                    finish()
-                })
-                .setPositiveButton(R.string.defeat_yes, { dialog, i ->
-                    recreate()
-                })
-                .create()
-                .show()
+    fun showEndDialog(msgId: Int) {
+        Toast.makeText(this, msgId, Toast.LENGTH_SHORT).show()
+        rootLayout!!.animate()
+                .alpha(0f)
+                .setDuration(1000)
+                .withEndAction { restart() }
+    }
+
+    fun restart() {
+        init = true
+        cat = Cat()
+        cells = Array(Ys + 1) { arrayOfNulls<Cell>(Xs + 1) }
+        navGrid = CatNavigationGrid(cells)
+
+        init()
     }
 
 }
