@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import org.jetbrains.anko.*
 import org.xguzm.pathfinding.grid.finders.AStarGridFinder
@@ -19,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private val Ys = 10
 
     private val finder = AStarGridFinder(Cell::class.java, GridFinderOptions(true, false, ManhattanDistance(), false, 1f, 1f))
+    private var cellWidth = 32
 
     private var init = true
     private var cat = Cat()
@@ -28,6 +30,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // todo calculate cellWidth for difference screens
 
         init()
     }
@@ -57,19 +61,21 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         if (y % 2 == 0) {
-                            setPadding(0, 0, dip(12), 0)
+                            setPadding(0, 0, dip(cellWidth / 2), 0)
                         } else {
-                            setPadding(dip(12), 0, 0, 0)
+                            setPadding(dip(cellWidth / 2), 0, 0, 0)
                         }
 
                         for (x in 0..Xs) {
                             val imageView = imageView {
                                 lparams {
                                     weight = 1f
-                                    width = ViewGroup.LayoutParams.WRAP_CONTENT
-                                    height = ViewGroup.LayoutParams.WRAP_CONTENT
+                                    width = dip(cellWidth)
+                                    height = dip(cellWidth * 0.85f)
                                 }
-                                imageResource = R.drawable.ic_cell
+                                scaleType = ImageView.ScaleType.FIT_XY
+                                val bitmap = BitmapFactory.decodeStream(assets.open("sprites/bars_wood_green.png"))
+                                setImageDrawable(OneShotAnimationDrawable(bitmap, 6, 150))
 
                                 onClick {
                                     cells[x][y]?.check()
@@ -91,11 +97,12 @@ class MainActivity : AppCompatActivity() {
 
             cat.view = imageView {
                 lparams {
-                    width = ViewGroup.LayoutParams.WRAP_CONTENT
-                    height = ViewGroup.LayoutParams.WRAP_CONTENT
+                    width = dip(cellWidth)
+                    height = dip(cellWidth)
                 }
+                scaleType = ImageView.ScaleType.FIT_XY
                 isClickable = true
-                // todo change resource
+
                 val bitmap = BitmapFactory.decodeStream(assets.open("sprites/boss6/boss6_cry.png"))
                 val animation = AssetAnimationDrawable(bitmap, 6, 10)
                 setImageDrawable(animation)

@@ -15,7 +15,7 @@ class Cell(x: Int, y: Int, val view: ImageView) : GridCell(x, y) {
         isWalkable = false
 
         view.isClickable = false
-        view.setColorFilter(view.resources.getColor(R.color.activated_cell))
+        (view.drawable as OneShotAnimationDrawable).start()
     }
 
 }
