@@ -3,6 +3,7 @@ package com.timursoft.catchthecat
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +21,8 @@ class MainActivity : AppCompatActivity() {
     private val Ys = 10
 
     private val finder = AStarGridFinder(Cell::class.java, GridFinderOptions(true, false, ManhattanDistance(), false, 1f, 1f))
-    private var cellWidth = 32
+    private var statusBarHeight = 0
+    private var cellWidth = 24
 
     private var init = true
     private var cat = Cat()
@@ -31,13 +33,22 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // todo calculate cellWidth for difference screens
+        statusBarHeight = getStatusBarHeight()
+
+        val displayMetrics = resources.displayMetrics
+        val dpHeight = (displayMetrics.heightPixels - statusBarHeight) / displayMetrics.density
+        val dpWidth = displayMetrics.widthPixels / displayMetrics.density
+
+        cellWidth = (dpHeight / Ys).toInt()
+        if (cellWidth * 11 > dpWidth) {
+            cellWidth = (dpWidth / 11).toInt()
+        }
 
         init()
     }
 
     fun init() {
-        cat.statusBarHeight = getStatusBarHeight()
+        cat.statusBarHeight = statusBarHeight
 
         rootLayout = frameLayout {
             lparams {
