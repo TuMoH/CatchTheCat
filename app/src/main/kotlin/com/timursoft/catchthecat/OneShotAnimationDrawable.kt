@@ -1,54 +1,12 @@
 package com.timursoft.catchthecat
 
-import android.graphics.*
-import android.graphics.drawable.Drawable
+import android.graphics.Bitmap
+import android.graphics.Rect
 import android.os.SystemClock
 
-class OneShotAnimationDrawable(var bitmap: Bitmap, val frames: Int, duration: Int) : Drawable(), Runnable {
+class OneShotAnimationDrawable(bitmap: Bitmap, frames: Int, duration: Int) : AbstractAnimationDrawable(bitmap, frames) {
 
-    private val bitmapPaint: Paint
-
-    private val width: Int
-    private val height: Int
-
-    private var frame: Int = 0
-    private var frameRect: Rect
     private val frameDuration = duration / frames
-
-    init {
-        width = bitmap.width / frames
-        height = bitmap.height
-
-        bitmapPaint = Paint()
-        bitmapPaint.isFilterBitmap = true
-
-        frame = 0
-        frameRect = Rect(0, 0, width, height)
-    }
-
-    override fun draw(canvas: Canvas) {
-        canvas.drawBitmap(bitmap, frameRect, copyBounds(), bitmapPaint)
-    }
-
-    override fun getOpacity(): Int {
-        return PixelFormat.OPAQUE
-    }
-
-    override fun setAlpha(a: Int) {
-        bitmapPaint.alpha = a
-    }
-
-    override fun setColorFilter(filter: ColorFilter?) {
-        bitmapPaint.colorFilter = filter
-    }
-
-    override fun getIntrinsicWidth(): Int {
-        return width
-    }
-
-    override fun getIntrinsicHeight(): Int {
-        return height
-    }
 
     override fun run() {
         frame++
@@ -63,21 +21,6 @@ class OneShotAnimationDrawable(var bitmap: Bitmap, val frames: Int, duration: In
 
         val tick = SystemClock.uptimeMillis()
         scheduleSelf(this, tick + frameDuration)
-    }
-
-    fun start() {
-        run()
-    }
-
-    fun stop() {
-        unscheduleSelf(this)
-    }
-
-    fun recycle() {
-        stop()
-        if (!bitmap.isRecycled) {
-            bitmap.recycle()
-        }
     }
 
 }
