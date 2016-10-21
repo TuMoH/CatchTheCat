@@ -1,12 +1,19 @@
 package com.timursoft.catchthecat
 
+import android.annotation.TargetApi
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.app.Activity
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.VectorDrawable
+import android.os.Build
+import android.support.v4.content.ContextCompat
 import android.widget.ImageView
 import android.widget.Toast
 import org.jetbrains.anko.*
@@ -15,7 +22,7 @@ import org.xguzm.pathfinding.grid.finders.GridFinderOptions
 import org.xguzm.pathfinding.grid.heuristics.ManhattanDistance
 import java.util.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
 
     private val Xs = 10
     private val Ys = 10
@@ -23,6 +30,8 @@ class MainActivity : AppCompatActivity() {
     private val finder = AStarGridFinder(Cell::class.java, GridFinderOptions(true, false, ManhattanDistance(), false, 1f, 1f))
     private var statusBarHeight = 0
     private var cellWidth = 24
+    private lateinit var cellBitmap: Bitmap
+    private lateinit var catBitmap: Bitmap
 
     private var init = true
     private var cat = Cat()
@@ -32,6 +41,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        cellBitmap = BitmapFactory.decodeResource(resources, R.drawable.cell)
+        catBitmap = BitmapFactory.decodeStream(assets.open("sprites/boss6/boss6_cry.png"))
 
         statusBarHeight = getStatusBarHeight()
 
@@ -85,8 +96,7 @@ class MainActivity : AppCompatActivity() {
                                     height = dip(cellWidth * 0.85f)
                                 }
                                 scaleType = ImageView.ScaleType.FIT_XY
-                                val bitmap = BitmapFactory.decodeStream(assets.open("sprites/bars_wood_green.png"))
-                                setImageDrawable(OneShotAnimationDrawable(bitmap, 6, 150))
+                                setImageDrawable(OneShotAnimationDrawable(cellBitmap, 4, 150))
 
                                 onClick {
                                     cells[x][y]?.check()
@@ -114,8 +124,7 @@ class MainActivity : AppCompatActivity() {
                 scaleType = ImageView.ScaleType.FIT_XY
                 isClickable = true
 
-                val bitmap = BitmapFactory.decodeStream(assets.open("sprites/boss6/boss6_cry.png"))
-                val animation = AssetAnimationDrawable(bitmap, 6, 10)
+                val animation = AssetAnimationDrawable(catBitmap, 6, 10)
                 setImageDrawable(animation)
                 animation.start()
             }
