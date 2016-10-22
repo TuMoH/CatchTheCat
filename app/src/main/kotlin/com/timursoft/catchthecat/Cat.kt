@@ -10,7 +10,7 @@ class Cat(res: Resources, var statusBarHeight: Int) {
     private val DEFAULT_DURATION: Long = 300
 
     private val idle: AnimationDrawable
-    private val sleep: AnimationDrawable
+    private val sleep: OneShotAnimationDrawable
     private val left_bottom: AnimationDrawable
     private val right_bottom: AnimationDrawable
     private val left_top: AnimationDrawable
@@ -22,7 +22,7 @@ class Cat(res: Resources, var statusBarHeight: Int) {
 
     init {
         idle = AnimationDrawable(BitmapFactory.decodeResource(res, R.drawable.cat_idle), 8, 7)
-        sleep = AnimationDrawable(BitmapFactory.decodeResource(res, R.drawable.cat_sleep), 4, 4)
+        sleep = OneShotAnimationDrawable(BitmapFactory.decodeResource(res, R.drawable.cat_sleep), 13, 1500)
 
         val RUN_FRAME = 4
         val RUN_FPS = 8

@@ -23,4 +23,8 @@ class OneShotAnimationDrawable(bitmap: Bitmap, frames: Int, duration: Int) : Abs
         scheduleSelf(this, tick + frameDuration)
     }
 
+    override fun start() {
+        frame = 0
+        super.start()
+    }
 }

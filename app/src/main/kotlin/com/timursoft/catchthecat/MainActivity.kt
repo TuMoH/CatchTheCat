@@ -202,17 +202,18 @@ class MainActivity : Activity() {
 
     fun win() {
         cat.goSleep()
-        restartGame()
+        restartGame(1000)
     }
 
     fun fail() {
         cat.goOut()
-        restartGame()
+        restartGame(0)
     }
 
-    fun restartGame() {
+    fun restartGame(startDelay: Long) {
         rootLayout.animate()
                 .alpha(0f)
+                .setStartDelay(startDelay)
                 .setDuration(END_DURATION)
                 .withEndAction { init() }
     }

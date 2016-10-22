@@ -41,7 +41,7 @@ abstract class AbstractAnimationDrawable(var bitmap: Bitmap, val frames: Int) : 
         return height
     }
 
-    fun start() {
+    open fun start() {
         run()
     }
 
