@@ -9,7 +9,6 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.Toast
 import org.jetbrains.anko.*
 import org.xguzm.pathfinding.grid.finders.AStarGridFinder
 import org.xguzm.pathfinding.grid.finders.GridFinderOptions
@@ -18,11 +17,14 @@ import java.util.*
 
 class MainActivity : Activity() {
 
+    companion object {
+        val Xs = 10
+        val Ys = 10
+        val END_DURATION: Long = 1000
+    }
+
     private val CELL_RES = R.drawable.cell
     private val CELL_FRAME = 6
-
-    private val Xs = 10
-    private val Ys = 10
 
     private val finder = AStarGridFinder(Cell::class.java, GridFinderOptions(true, false, ManhattanDistance(), false, 1f, 1f))
     private var statusBarHeight = 0
@@ -102,8 +104,8 @@ class MainActivity : Activity() {
 
                                 onClick {
                                     cells[x][y]?.check()
-                                    if (isEnd()) {
-                                        showEndDialog(R.string.defeat_msg)
+                                    if (isFail()) {
+                                        fail()
                                     } else {
                                         val path = findPath()
                                         if (path != null) {
@@ -138,7 +140,7 @@ class MainActivity : Activity() {
                     cat.move(cells[Ys / 2][Xs / 2]!!, 0)
 
                     val random = Random()
-                    var needCheck = random.nextInt(12 - 7) + 7
+                    var needCheck = random.nextInt(12 - 8) + 8
                     while (needCheck > 0) {
                         val x = random.nextInt(Xs)
                         val y = random.nextInt(Ys)
@@ -162,7 +164,7 @@ class MainActivity : Activity() {
         return result
     }
 
-    fun isEnd(): Boolean {
+    fun isFail(): Boolean {
         return cat.x == 0 || cat.y == 0 || cat.x == Xs || cat.y == Ys
     }
 
@@ -179,7 +181,7 @@ class MainActivity : Activity() {
         }
 
         if (path == null) {
-            showEndDialog(R.string.win_msg)
+            win()
             return null
         }
 
@@ -198,11 +200,20 @@ class MainActivity : Activity() {
         return lastShortPath
     }
 
-    fun showEndDialog(msgId: Int) {
-        Toast.makeText(this, msgId, Toast.LENGTH_SHORT).show()
+    fun win() {
+        cat.goSleep()
+        restartGame()
+    }
+
+    fun fail() {
+        cat.goOut()
+        restartGame()
+    }
+
+    fun restartGame() {
         rootLayout.animate()
                 .alpha(0f)
-                .setDuration(1000)
+                .setDuration(END_DURATION)
                 .withEndAction { init() }
     }
 
