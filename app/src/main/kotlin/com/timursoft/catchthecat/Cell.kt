@@ -12,6 +12,8 @@ class Cell(x: Int, y: Int, val view: ImageView) : GridCell(x, y) {
     }
 
     fun check() {
+        if (!isWalkable) return
+
         isWalkable = false
 
         view.isClickable = false
