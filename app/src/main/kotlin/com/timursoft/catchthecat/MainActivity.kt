@@ -4,6 +4,7 @@ import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -32,6 +33,8 @@ class MainActivity : Activity() {
     private var cellHeight = 20
     private lateinit var cellBitmap: Bitmap
 
+    private lateinit var mediaPlayer: MediaPlayer
+
     private var init = true
     private lateinit var cat: Cat
     private lateinit var rootLayout: View
@@ -42,7 +45,8 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         cellBitmap = BitmapFactory.decodeResource(resources, CELL_RES)
 
-        // todo добавить фоновую музыку
+        mediaPlayer = MediaPlayer.create(this, R.raw.sound)
+        mediaPlayer.isLooping = true
 
         statusBarHeight = getStatusBarHeight()
         cat = Cat(resources, statusBarHeight)
@@ -218,4 +222,13 @@ class MainActivity : Activity() {
                 .withEndAction { init() }
     }
 
+    override fun onResume() {
+        super.onResume()
+        mediaPlayer.start()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mediaPlayer.stop()
+    }
 }
