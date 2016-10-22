@@ -27,4 +27,5 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile 'com.github.xaguzman:pathfinding:0.2.6'
     compile 'org.jetbrains.anko:anko-sdk15:0.9'
+    compile 'com.google.android.gms:play-services-ads:9.8.00'
 }

@@ -10,6 +10,10 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.InterstitialAd
+import com.google.android.gms.ads.MobileAds
 import org.jetbrains.anko.*
 import org.xguzm.pathfinding.grid.finders.AStarGridFinder
 import org.xguzm.pathfinding.grid.finders.GridFinderOptions
@@ -22,6 +26,9 @@ class MainActivity : Activity() {
         val Xs = 10
         val Ys = 10
         val END_DURATION: Long = 1000
+
+        val ADMOB_APP_ID = "ca-app-pub-2095517763260319~8181496184"
+        val ADMOB_BANER_ID = "ca-app-pub-2095517763260319/3611695787"
     }
 
     private val CELL_RES = R.drawable.cell
@@ -41,8 +48,23 @@ class MainActivity : Activity() {
     private lateinit var cells: Array<Array<Cell?>>
     private lateinit var navGrid: CatNavigationGrid
 
+    private lateinit var interstitialAd: InterstitialAd
+    private var adCount = 0
+    private val adCountLimit = 3
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        MobileAds.initialize(applicationContext, ADMOB_APP_ID)
+        interstitialAd = InterstitialAd(this)
+        interstitialAd.adUnitId = ADMOB_BANER_ID
+        interstitialAd.adListener = object : AdListener() {
+            override fun onAdClosed() {
+                requestNewInterstitial()
+            }
+        }
+        requestNewInterstitial()
+
         cellBitmap = BitmapFactory.decodeResource(resources, CELL_RES)
 
         mediaPlayer = MediaPlayer.create(this, R.raw.sound)
@@ -219,7 +241,22 @@ class MainActivity : Activity() {
                 .alpha(0f)
                 .setStartDelay(startDelay)
                 .setDuration(END_DURATION)
-                .withEndAction { init() }
+                .withEndAction {
+                    init()
+                    adCount++
+                    if (adCount >= adCountLimit) {
+                        adCount = 0
+                        if (interstitialAd.isLoaded) {
+                            interstitialAd.show()
+                        } else {
+                            requestNewInterstitial()
+                        }
+                    }
+                }
+    }
+
+    fun requestNewInterstitial() {
+        interstitialAd.loadAd(AdRequest.Builder().build())
     }
 
     override fun onResume() {
