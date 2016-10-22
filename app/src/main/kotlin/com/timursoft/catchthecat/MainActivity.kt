@@ -17,12 +17,18 @@ import java.util.*
 
 class MainActivity : Activity() {
 
+    private val CELL_RES = R.drawable.cell
+    private val CELL_FRAME = 6
+    private val CAT_IDLE_RES = R.drawable.blackcat_idle
+    private val CAT_IDLE_FRAME = 8
+
     private val Xs = 10
     private val Ys = 10
 
     private val finder = AStarGridFinder(Cell::class.java, GridFinderOptions(true, false, ManhattanDistance(), false, 1f, 1f))
     private var statusBarHeight = 0
     private var cellWidth = 24
+    private var cellHeight = 20
     private lateinit var cellBitmap: Bitmap
     private lateinit var catBitmap: Bitmap
 
@@ -34,8 +40,10 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        cellBitmap = BitmapFactory.decodeResource(resources, R.drawable.cell)
-        catBitmap = BitmapFactory.decodeStream(assets.open("sprites/boss6/boss6_cry.png"))
+        cellBitmap = BitmapFactory.decodeResource(resources, CELL_RES)
+        catBitmap = BitmapFactory.decodeResource(resources, CAT_IDLE_RES)
+
+        // todo добавить фоновую музыку
 
         statusBarHeight = getStatusBarHeight()
 
@@ -47,6 +55,7 @@ class MainActivity : Activity() {
         if (cellWidth * 11 > dpWidth) {
             cellWidth = (dpWidth / 11).toInt()
         }
+        cellHeight = (cellWidth * 0.85f).toInt()
 
         init()
     }
@@ -86,10 +95,10 @@ class MainActivity : Activity() {
                                 lparams {
                                     weight = 1f
                                     width = dip(cellWidth)
-                                    height = dip(cellWidth * 0.85f)
+                                    height = dip(cellHeight)
                                 }
                                 scaleType = ImageView.ScaleType.FIT_XY
-                                setImageDrawable(OneShotAnimationDrawable(cellBitmap, 4, 150))
+                                setImageDrawable(OneShotAnimationDrawable(cellBitmap, CELL_FRAME, 200))
 
                                 onClick {
                                     cells[x][y]?.check()
@@ -112,12 +121,12 @@ class MainActivity : Activity() {
             cat.view = imageView {
                 lparams {
                     width = dip(cellWidth)
-                    height = dip(cellWidth)
+                    height = dip(cellHeight)
                 }
                 scaleType = ImageView.ScaleType.FIT_XY
                 isClickable = true
 
-                val animation = AssetAnimationDrawable(catBitmap, 6, 10)
+                val animation = AssetAnimationDrawable(catBitmap, CAT_IDLE_FRAME, 15)
                 setImageDrawable(animation)
                 animation.start()
             }
