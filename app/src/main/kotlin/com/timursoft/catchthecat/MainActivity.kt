@@ -3,6 +3,7 @@ package com.timursoft.catchthecat
 import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -129,6 +130,11 @@ class MainActivity : Activity() {
             addOnLayoutChangeListener { view, i, k, l, j, h, g, f, d ->
                 if (init) {
                     init = false
+
+                    val rect = Rect()
+                    rootLayout.getWindowVisibleDisplayFrame(rect)
+                    cat.statusBarHeight = rect.top
+
                     cat.move(cells[Ys / 2][Xs / 2]!!, 0)
 
                     val random = Random()

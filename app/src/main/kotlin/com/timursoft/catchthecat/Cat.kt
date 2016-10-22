@@ -5,7 +5,7 @@ import android.content.res.Resources
 import android.graphics.BitmapFactory
 import android.widget.ImageView
 
-class Cat(res: Resources, val statusBarHeight: Int) {
+class Cat(res: Resources, var statusBarHeight: Int) {
 
     private val DEFAULT_DURATION: Long = 300
 
