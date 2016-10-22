@@ -19,7 +19,7 @@ class MainActivity : Activity() {
 
     private val CELL_RES = R.drawable.cell
     private val CELL_FRAME = 6
-    private val CAT_IDLE_RES = R.drawable.blackcat_idle
+    private val CAT_IDLE_RES = R.drawable.cat_idle
     private val CAT_IDLE_FRAME = 8
 
     private val Xs = 10
@@ -126,7 +126,7 @@ class MainActivity : Activity() {
                 scaleType = ImageView.ScaleType.FIT_XY
                 isClickable = true
 
-                val animation = AssetAnimationDrawable(catBitmap, CAT_IDLE_FRAME, 15)
+                val animation = AnimationDrawable(catBitmap, CAT_IDLE_FRAME, 8)
                 setImageDrawable(animation)
                 animation.start()
             }
