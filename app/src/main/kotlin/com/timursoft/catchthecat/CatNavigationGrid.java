@@ -42,9 +42,6 @@ public class CatNavigationGrid implements NavigationGridGraph<Cell> {
         return this.contains(x, y) && this.nodes[x][y].isWalkable();
     }
 
-    ;
-
-
     /**
      * Determine wether the given x,y pair is within the bounds of this grid
      *

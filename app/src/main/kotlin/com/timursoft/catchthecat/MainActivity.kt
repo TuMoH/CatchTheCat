@@ -19,8 +19,6 @@ class MainActivity : Activity() {
 
     private val CELL_RES = R.drawable.cell
     private val CELL_FRAME = 6
-    private val CAT_IDLE_RES = R.drawable.cat_idle
-    private val CAT_IDLE_FRAME = 8
 
     private val Xs = 10
     private val Ys = 10
@@ -30,22 +28,21 @@ class MainActivity : Activity() {
     private var cellWidth = 24
     private var cellHeight = 20
     private lateinit var cellBitmap: Bitmap
-    private lateinit var catBitmap: Bitmap
 
     private var init = true
-    private var cat = Cat()
-    private var rootLayout: View? = null
-    private var cells: Array<Array<Cell?>> = Array(Ys + 1) { arrayOfNulls<Cell>(Xs + 1) }
-    private var navGrid = CatNavigationGrid(cells)
+    private lateinit var cat: Cat
+    private lateinit var rootLayout: View
+    private lateinit var cells: Array<Array<Cell?>>
+    private lateinit var navGrid: CatNavigationGrid
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         cellBitmap = BitmapFactory.decodeResource(resources, CELL_RES)
-        catBitmap = BitmapFactory.decodeResource(resources, CAT_IDLE_RES)
 
         // todo добавить фоновую музыку
 
         statusBarHeight = getStatusBarHeight()
+        cat = Cat(resources, statusBarHeight)
 
         val displayMetrics = resources.displayMetrics
         val dpHeight = (displayMetrics.heightPixels - statusBarHeight) / displayMetrics.density
@@ -61,7 +58,9 @@ class MainActivity : Activity() {
     }
 
     fun init() {
-        cat.statusBarHeight = statusBarHeight
+        init = true
+        cells = Array(Ys + 1) { arrayOfNulls<Cell>(Xs + 1) }
+        navGrid = CatNavigationGrid(cells)
 
         rootLayout = frameLayout {
             lparams {
@@ -125,10 +124,6 @@ class MainActivity : Activity() {
                 }
                 scaleType = ImageView.ScaleType.FIT_XY
                 isClickable = true
-
-                val animation = AnimationDrawable(catBitmap, CAT_IDLE_FRAME, 8)
-                setImageDrawable(animation)
-                animation.start()
             }
 
             addOnLayoutChangeListener { view, i, k, l, j, h, g, f, d ->
@@ -146,7 +141,7 @@ class MainActivity : Activity() {
                             needCheck--
                         }
                     }
-                    rootLayout!!.animate().alpha(1f).duration = 1000
+                    rootLayout.animate().alpha(1f).duration = 1000
                 }
             }
         }
@@ -199,19 +194,10 @@ class MainActivity : Activity() {
 
     fun showEndDialog(msgId: Int) {
         Toast.makeText(this, msgId, Toast.LENGTH_SHORT).show()
-        rootLayout!!.animate()
+        rootLayout.animate()
                 .alpha(0f)
                 .setDuration(1000)
-                .withEndAction { restart() }
-    }
-
-    fun restart() {
-        init = true
-        cat = Cat()
-        cells = Array(Ys + 1) { arrayOfNulls<Cell>(Xs + 1) }
-        navGrid = CatNavigationGrid(cells)
-
-        init()
+                .withEndAction { init() }
     }
 
 }
