@@ -61,6 +61,7 @@ class MainActivity : Activity() {
         interstitialAd.adListener = object : AdListener() {
             override fun onAdClosed() {
                 requestNewInterstitial()
+                init = true
             }
         }
         requestNewInterstitial()
