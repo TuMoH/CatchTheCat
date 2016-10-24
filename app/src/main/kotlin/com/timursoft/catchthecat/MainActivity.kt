@@ -43,6 +43,7 @@ class MainActivity : Activity() {
     private lateinit var mediaPlayer: MediaPlayer
 
     private var init = true
+    private var initCells = true
     private lateinit var cat: Cat
     private lateinit var rootLayout: View
     private lateinit var cells: Array<Array<Cell?>>
@@ -89,6 +90,7 @@ class MainActivity : Activity() {
 
     fun init() {
         init = true
+        initCells = true
         cells = Array(Ys + 1) { arrayOfNulls<Cell>(Xs + 1) }
         navGrid = CatNavigationGrid(cells)
 
@@ -166,14 +168,18 @@ class MainActivity : Activity() {
 
                     cat.move(cells[Ys / 2][Xs / 2]!!, 0)
 
-                    val random = Random()
-                    var needCheck = random.nextInt(12 - 8) + 8
-                    while (needCheck > 0) {
-                        val x = random.nextInt(Xs)
-                        val y = random.nextInt(Ys)
-                        if (x !in 4..6 && y !in 4..6) {
-                            cells[x][y]?.check()
-                            needCheck--
+                    if (initCells) {
+                        initCells = false
+
+                        val random = Random()
+                        var needCheck = random.nextInt(12 - 8) + 8
+                        while (needCheck > 0) {
+                            val x = random.nextInt(Xs)
+                            val y = random.nextInt(Ys)
+                            if (x !in 4..6 && y !in 4..6) {
+                                cells[x][y]?.check()
+                                needCheck--
+                            }
                         }
                     }
                     rootLayout.animate().alpha(1f).duration = 1000
