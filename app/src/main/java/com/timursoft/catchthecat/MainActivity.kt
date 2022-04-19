@@ -10,10 +10,8 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.InterstitialAd
-import com.google.android.gms.ads.MobileAds
+import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_INDEFINITE
+import com.google.android.material.snackbar.Snackbar
 import org.jetbrains.anko.*
 import org.xguzm.pathfinding.grid.finders.AStarGridFinder
 import org.xguzm.pathfinding.grid.finders.GridFinderOptions
@@ -26,15 +24,15 @@ class MainActivity : Activity() {
         val Xs = 10
         val Ys = 10
         val END_DURATION: Long = 1000
-
-        val ADMOB_APP_ID = "ca-app-pub-2095517763260319~8181496184"
-        val ADMOB_BANER_ID = "ca-app-pub-2095517763260319/3611695787"
     }
 
     private val CELL_RES = R.drawable.cell
     private val CELL_FRAME = 6
 
-    private val finder = AStarGridFinder(Cell::class.java, GridFinderOptions(true, false, ManhattanDistance(), false, 1f, 1f))
+    private val finder = AStarGridFinder(
+        Cell::class.java,
+        GridFinderOptions(true, false, ManhattanDistance(), false, 1f, 1f)
+    )
     private var statusBarHeight = 0
     private var cellWidth = 24
     private var cellHeight = 20
@@ -49,23 +47,10 @@ class MainActivity : Activity() {
     private lateinit var cells: Array<Array<Cell?>>
     private lateinit var navGrid: CatNavigationGrid
 
-    private lateinit var interstitialAd: InterstitialAd
-    private var adCount = 0
-    private val adCountLimit = 3
+    private var isWin = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        MobileAds.initialize(applicationContext, ADMOB_APP_ID)
-        interstitialAd = InterstitialAd(this)
-        interstitialAd.adUnitId = ADMOB_BANER_ID
-        interstitialAd.adListener = object : AdListener() {
-            override fun onAdClosed() {
-                requestNewInterstitial()
-                init = true
-            }
-        }
-        requestNewInterstitial()
 
         cellBitmap = BitmapFactory.decodeResource(resources, CELL_RES)
 
@@ -123,15 +108,16 @@ class MainActivity : Activity() {
 
                         for (x in 0..Xs) {
                             val imageView = imageView {
-                                lparams {
-                                    weight = 1f
-                                    width = dip(cellWidth)
-                                    height = dip(cellHeight)
-                                }
                                 scaleType = ImageView.ScaleType.FIT_XY
-                                setImageDrawable(OneShotAnimationDrawable(cellBitmap, CELL_FRAME, 200))
+                                setImageDrawable(
+                                    OneShotAnimationDrawable(
+                                        cellBitmap,
+                                        CELL_FRAME,
+                                        200
+                                    )
+                                )
 
-                                onClick {
+                                setOnClickListener {
                                     cells[x][y]?.check()
                                     if (isFail()) {
                                         fail()
@@ -142,6 +128,10 @@ class MainActivity : Activity() {
                                         }
                                     }
                                 }
+                            }.lparams {
+                                weight = 1f
+                                width = dip(cellWidth)
+                                height = dip(cellHeight)
                             }
                             cells[x][y] = Cell(x, y, imageView)
                         }
@@ -150,12 +140,11 @@ class MainActivity : Activity() {
             }
 
             cat.view = imageView {
-                lparams {
-                    width = dip(cellWidth)
-                    height = dip(cellHeight)
-                }
                 scaleType = ImageView.ScaleType.FIT_XY
                 isClickable = true
+            }.lparams {
+                width = dip(cellWidth)
+                height = dip(cellHeight)
             }
 
             addOnLayoutChangeListener { view, i, k, l, j, h, g, f, d ->
@@ -235,7 +224,9 @@ class MainActivity : Activity() {
 
     fun win() {
         cat.goSleep()
-        restartGame(1000)
+        Snackbar.make(rootLayout, "Congratulations!", LENGTH_INDEFINITE)
+            .setAction("Restart") { restartGame(0) }
+            .show()
     }
 
     fun fail() {
@@ -245,25 +236,12 @@ class MainActivity : Activity() {
 
     fun restartGame(startDelay: Long) {
         rootLayout.animate()
-                .alpha(0f)
-                .setStartDelay(startDelay)
-                .setDuration(END_DURATION)
-                .withEndAction {
-                    init()
-                    adCount++
-                    if (adCount >= adCountLimit) {
-                        adCount = 0
-                        if (interstitialAd.isLoaded) {
-                            interstitialAd.show()
-                        } else {
-                            requestNewInterstitial()
-                        }
-                    }
-                }
-    }
-
-    fun requestNewInterstitial() {
-        interstitialAd.loadAd(AdRequest.Builder().build())
+            .alpha(0f)
+            .setStartDelay(startDelay)
+            .setDuration(END_DURATION)
+            .withEndAction {
+                init()
+            }
     }
 
     override fun onResume() {

@@ -1,31 +1,41 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    compileSdk 32
+
     defaultConfig {
         applicationId "com.timursoft.catchthecat"
-        minSdkVersion 16
-        targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        minSdk 24
+        targetSdk 32
+        versionCode 3
+        versionName "3.0"
     }
+
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:25.0.0'
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile 'com.github.xaguzman:pathfinding:0.2.6'
-    compile 'org.jetbrains.anko:anko-sdk15:0.9'
-    compile 'com.google.android.gms:play-services-ads:9.8.00'
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.5.0'
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    implementation 'com.flickr4java:flickr4java:3.0.6'
+    implementation 'com.github.xaguzman:pathfinding:0.2.6'
+    implementation "org.jetbrains.anko:anko-commons:0.10.8"
+    implementation 'org.jetbrains.anko:anko-sdk23:0.10.8'
 }
